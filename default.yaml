@@ -1,0 +1,20 @@
+# Insert your EUM Data Store key and pw here for the data download to work.
+eum_dac:
+  consumer_key: '<YOUR_CONSUMER_KEY>'
+  consumer_secret: '<YOUR_CONSUMER_SECRET>'
+
+products:
+  l2lef:
+    eum_dac_key: 'EO:EUM:DAT:0690'
+    reader: 'li_l2_nc'
+    fn_pattern: 'LI-2-LEF-'
+  l2lgr:
+    eum_dac_key: 'EO:EUM:DAT:0782'
+    reader: 'li_l2_nc'
+    fn_pattern: 'LI-2-LGR-'
+  l2lfl:
+    eum_dac_key: 'EO:EUM:DAT:0691'
+    reader: 'li_l2_nc'
+    fn_pattern: 'LI-2-LFL-'
+
+parallax_lut_dir: './LUTs_parallax_correction/'
