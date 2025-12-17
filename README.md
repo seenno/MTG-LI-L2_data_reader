@@ -9,17 +9,16 @@ the corrected data locally for any later use. This is especially useful if longe
 
 ## Getting started
 
-1) Clone the repository.
+1) Just place the files and subdirectories into a directory. About ~2.4GB of disk space is required as
+the code comes with monthly look-up tables for time and parallax correction.
 
-2) Download the light-travel-time and parallax correction look-up tables from the EUM server located at
-https://sftp.eumetsat.int/public/folder/UsCVknVOOkSyCdgpMimJNQ/User-Materials/MTGUP/LI_parallax_correction/. 
-Only the file named `SSP_0_LUT.tar.gz` needs to be downloaded and extracted in `./LUTs_parallax_correction/`
-subdirectory (will result in 12 monthly files with a total size of ~2.4GB).
-
-3) For the EUM Data Store download to work, open the `default.yaml` configuration file and fill in the 
+2) For the EUM Data Store download to work, open the `default.yaml` configuration file and fill in the 
 `consumer_key` and `consumer_secret` in the `eum_dac` section with your personal EUM Data Store credentials.
+Not a EUM Data Store user yet? You can register here: https://user.eumetsat.int/register. Then log in,
+click on your username in the top right and then click on "API Key" and copy the Consumer key and
+Consumer secret shown in the "User credentials" section. 
 
-4) Not absolutely necessary but still highly recommended - use the `./conda_env/mtg_environment.yml` file
+3) Not absolutely necessary but still highly recommended - use the `./conda_env/mtg_environment.yml` file
 to create a dedicated conda environment for running the tool. This allows one to create a clean replica of 
 the python environment where the scripts have been successfully tested. Using your own python environment
 might result in unexpected errors as the `netCDF` module is sensitive to some package inconsistencies that
