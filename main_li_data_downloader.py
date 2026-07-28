@@ -32,25 +32,22 @@ from main_li_data_reader import period_start_end
 cfg = config.load()
 
 
-def delete_auxiliary_files(download_dir):
+def delete_auxiliary_files(download_dir, unzipped_dirs):
     """
     Each LI product comes from the EUM Data Store with multiple auxiliary files (trailers,
     quicklooks, manifests) that are normally not needed by users. This script deletes all
     such files and only keeps the *BODY* files where the actual event/group/flash data is
     stored.
     Args:
-      download_dir: str full path of the output directory where the downloaded and unzipped
-        LI data files are located,
+      download_dir: str full path of the main download dir where the *.nc data files will
+        be moved to,
+      unzipped_dirs: list strs full paths of the downloaded and unzipped LI data dirs,
     Returns:
       None, removes unzipped LI product subdirectories and auxiliary files and keeps only
         the *BODY* files where LI event/group/flash data is stored.
     """
 
-    # Get all subdirectories in the main directory
-    subdirs = [d for d in sorted(os.listdir(download_dir)) if os.path.isdir(os.path.join(download_dir, d))]
-
-    for subdir in subdirs:
-        subdir_path = os.path.join(download_dir, subdir)
+    for subdir_path in unzipped_dirs:
         # Find the BODY files that contain the LI event/group/flash data.
         pattern = os.path.join(subdir_path, '*BODY*')
         files_to_move = glob.glob(pattern)
@@ -156,6 +153,7 @@ def download_eum_data(ds_name, start_time, end_time, out_dir):
     print('Downloading the products...')
     print('-' * 80)
     n_downloads = 0
+    downloaded_files = []
     for i, product in enumerate(products):
         if corresponding_nc_exists(str(product), out_dir):
             print(f"Skipping ({i+1}/{n_products}): {str(product)} already downloaded.")
@@ -164,6 +162,7 @@ def download_eum_data(ds_name, start_time, end_time, out_dir):
              with product.open() as src_file, open(os.path.join(out_dir, src_file.name), mode='wb') as dest_file:
                 shutil.copyfileobj(src_file, dest_file)
                 print(f'Download of product ({i+1}/{n_products}) {product} finished.')
+                downloaded_files.append(dest_file.name)
         except eumdac.product.ProductError as error:
             print(f"Error related to the product '{product}' while trying to download it: '{error.msg}'")
         except requests.exceptions.ConnectionError as error:
@@ -177,12 +176,14 @@ def download_eum_data(ds_name, start_time, end_time, out_dir):
         print('=' * 80)
         print('Extracting the downloaded files...')
         print('-' * 80)
-        for file in sorted(glob.glob(os.path.join(out_dir, '*.zip'))):
+        unzipped_dirs = []
+        for file in sorted(downloaded_files):
             if os.path.exists(file):
                 try:
                     with zipfile.ZipFile(file, 'r') as zip_ref:
                         # Extract the content of the .zip
                         zip_ref.extractall(path=f'{file[:-4]}/')
+                    unzipped_dirs.append(f'{file[:-4]}')
                 except zipfile.BadZipFile:
                     print(f"WARNING! Cannot extract {file}, not a valid ZIP archive.")
                 # Remove the .zip file in favour of the extracted product
@@ -195,7 +196,7 @@ def download_eum_data(ds_name, start_time, end_time, out_dir):
         print('=' * 80)
         print('Deleting auxiliary files and subdirectories..')
         print('-' * 80)
-        delete_auxiliary_files(out_dir)
+        delete_auxiliary_files(out_dir, unzipped_dirs)
 
     return
 
